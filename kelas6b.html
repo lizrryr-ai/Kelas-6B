@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelas 6B 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fff9f0;
+    --primary: #ff6b6b;
+    --secondary: #ffd93d;
+    --accent: #6bcb77;
+    --blue: #4d96ff;
+    --purple: #c77dff;
+    --card: #ffffff;
+    --text: #2d2d2d;
+    --soft: #f0f0f0;
+    --radius: 20px;
+    --shadow: 0 8px 30px rgba(0,0,0,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ===== BACKGROUND BLOBS ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -100px; left: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #ffd93d44, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -80px; right: -80px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, #ff6b6b33, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen {
+    display: none;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+  /* ===== LOGIN SCREEN ===== */
+  #loginScreen {
+    background: linear-gradient(135deg, #fff9f0 0%, #ffe8d6 100%);
+  }
+
+  .login-box {
+    background: white;
+    border-radius: 30px;
+    padding: 40px 36px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(255,107,107,0.2);
+    text-align: center;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .class-icon {
+    font-size: 72px;
+    margin-bottom: 10px;
+    display: block;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .login-box h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2rem;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+  .login-box p {
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+  }
+
+  .input-group {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 14px 20px;
+    border: 2.5px solid var(--soft);
+    border-radius: 14px;
+    font-size: 1rem;
+    font-family: 'Nunito', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fafafa;
+  }
+  .input-group input:focus {
+    border-color: var(--primary);
+    background: white;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+  }
+  .btn-primary:hover { background: #ff5252; box-shadow: 0 8px 25px rgba(255,107,107,0.5); }
+
+  .btn-admin {
+    background: transparent;
+    color: #bbb;
+    font-size: 0.85rem;
+    padding: 10px;
+    margin-top: 8px;
+    text-decoration: underline;
+    width: auto;
+  }
+  .btn-admin:hover { color: var(--purple); }
+
+  .error-msg {
+    color: var(--primary);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    height: 20px;
+    font-weight: 700;
+  }
+
+  /* ===== MAIN SCREEN ===== */
+  #mainScreen {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 20px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  #mainScreen.active { display: flex; }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-top: 10px;
+  }
+  .top-bar h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--primary);
+  }
+  .top-bar .emoji { font-size: 1.5rem; }
+
+  .notif-banner {
+    background: linear-gradient(135deg, #4d96ff, #6bcb77);
+    color: white;
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 6px 20px rgba(77,150,255,0.3);
+    animation: slideDown 0.4s ease;
+  }
+  @keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .notif-banner.granted {
+    background: linear-gradient(135deg, #6bcb77, #4d96ff);
+    cursor: default;
+  }
+  .notif-banner span { font-size: 1.5rem; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .card:nth-child(1) { animation-delay: 0.1s; }
+  .card:nth-child(2) { animation-delay: 0.2s; }
+  .card:nth-child(3) { animation-delay: 0.3s; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .card-icon {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .icon-piket { background: #fff3cd; }
+  .icon-pr { background: #fde8e8; }
+  .icon-desc { background: #e8f5e9; }
+
+  .card-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    color: var(--text);
+  }
+
+  /* PR status pill */
+  .pr-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+  .pr-ada { background: #fde8e8; color: var(--primary); }
+  .pr-tidak { background: #e8f5e9; color: var(--accent); }
+
+  .pr-detail {
+    background: #fff9f0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    min-height: 40px;
+  }
+
+  .piket-list, .desc-content {
+    background: #fafafa;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    color: #444;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    min-height: 40px;
+  }
+
+  .logout-btn {
+    background: transparent;
+    border: 2px solid #eee;
+    color: #aaa;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 8px;
+    margin-bottom: 24px;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  .logout-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* ===== ADMIN SCREEN ===== */
+  #adminScreen {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 20px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  #adminScreen.active { display: flex; }
+
+  .admin-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-top: 10px;
+  }
+  .admin-bar h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.6rem;
+    color: var(--purple);
+    flex: 1;
+  }
+  .badge-admin {
+    background: var(--purple);
+    color: white;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .admin-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border-top: 4px solid var(--purple);
+  }
+  .admin-card h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+    color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  textarea, select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--soft);
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    transition: border-color 0.2s;
+    background: #fafafa;
+  }
+  textarea:focus { border-color: var(--purple); background: white; }
+
+  select {
+    min-height: unset;
+    height: 44px;
+    cursor: pointer;
+  }
+  select:focus { border-color: var(--purple); }
+
+  .toggle-pr {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    border: 2.5px solid var(--soft);
+    background: white;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  .toggle-btn.selected-ada {
+    background: #fde8e8;
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  .toggle-btn.selected-tidak {
+    background: #e8f5e9;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-save {
+    background: var(--purple);
+    color: white;
+    box-shadow: 0 6px 20px rgba(199,125,255,0.4);
+    margin-top: 12px;
+  }
+  .btn-save:hover { background: #b060f0; }
+
+  .btn-notif {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+    margin-top: 8px;
+  }
+  .btn-notif:hover { background: #ff5252; }
+
+  .save-msg {
+    text-align: center;
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 0.9rem;
+    height: 20px;
+    margin-top: 6px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #2d2d2d;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Stars decoration */
+  .stars {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.5); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Stars decoration -->
+<div class="stars" id="stars"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Tersimpan!</div>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="screen active" id="loginScreen">
+  <div class="login-box">
+    <span class="class-icon">📚</span>
+    <h1>Kelas 6B</h1>
+    <p>Masukkan password untuk melihat info kelas</p>
+    <div class="input-group">
+      <input type="password" id="loginPass" placeholder="🔑 Masukkan password..." onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div class="error-msg" id="loginError"></div>
+    <button class="btn btn-primary" onclick="doLogin()">Masuk 🚀</button>
+    <br>
+    <button class="btn btn-admin" onclick="showAdminLogin()">⚙️ Login sebagai Admin</button>
+  </div>
+</div>
+
+<!-- ===== MAIN SCREEN ===== -->
+<div class="screen" id="mainScreen" style="min-height:100vh; justify-content:flex-start; padding:20px;">
+  <div style="width:100%; max-width:480px; margin:0 auto;">
+    <div class="top-bar">
+      <div>
+        <h1>📚 Kelas 6B</h1>
+        <div style="font-size:0.8rem;color:#aaa;font-weight:700;">Halo teman-teman! 👋</div>
+      </div>
+      <div class="emoji">🌟</div>
+    </div>
+
+    <!-- Notif banner -->
+    <div class="notif-banner" id="notifBanner" onclick="requestNotif()">
+      <span>🔔</span>
+      <div>
+        <div style="font-size:1rem;">Aktifkan Notifikasi PR</div>
+        <div style="font-size:0.8rem;opacity:0.9;">Tekan untuk izinkan notifikasi</div>
+      </div>
+    </div>
+
+    <!-- Card Piket -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-piket">🧹</div>
+        <div class="card-title">Jadwal Piket</div>
+      </div>
+      <div class="piket-list" id="viewPiket">Belum ada data piket.</div>
+    </div>
+
+    <!-- Card PR -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-pr">📝</div>
+        <div class="card-title">PR / Pekerjaan Rumah</div>
+      </div>
+      <div id="prStatusPill" class="pr-status pr-tidak">✅ Tidak ada PR</div>
+      <div class="pr-detail" id="viewPR">—</div>
+    </div>
+
+    <!-- Card Deskripsi -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-desc">📋</div>
+        <div class="card-title">Deskripsi / Pengumuman</div>
+      </div>
+      <div class="desc-content" id="viewDesc">Belum ada pengumuman.</div>
+    </div>
+
+    <button class="logout-btn" onclick="logout()">🚪 Keluar</button>
+  </div>
+</div>
+
+<!-- ===== ADMIN SCREEN ===== -->
+<div class="screen" id="adminScreen" style="min-height:100vh; justify-content:flex-start; padding:20px;">
+  <div style="width:100%; max-width:480px; margin:0 auto;">
+    <div class="admin-bar">
+      <h1>⚙️ Admin Panel</h1>
+      <div class="badge-admin">RAHASIA</div>
+    </div>
+
+    <!-- Edit Piket -->
+    <div class="admin-card">
+      <h3>🧹 Edit Jadwal Piket</h3>
+      <textarea id="editPiket" placeholder="Contoh:&#10;Senin: Budi, Sari&#10;Selasa: Andi, Rina&#10;..."></textarea>
+      <button class="btn btn-save" onclick="saveData('piket')">💾 Simpan Piket</button>
+      <div class="save-msg" id="msgPiket"></div>
+    </div>
+
+    <!-- Edit PR -->
+    <div class="admin-card">
+      <h3>📝 Edit Status PR</h3>
+      <div class="toggle-pr">
+        <button class="toggle-btn" id="btnAda" onclick="setPRStatus('ada')">📚 Ada PR</button>
+        <button class="toggle-btn selected-tidak" id="btnTidak" onclick="setPRStatus('tidak')">✅ Tidak Ada PR</button>
+      </div>
+      <textarea id="editPR" placeholder="Tulis detail PR di sini (mata pelajaran, halaman, dll)..."></textarea>
+      <button class="btn btn-save" onclick="saveData('pr')">💾 Simpan PR</button>
+      <div class="save-msg" id="msgPR"></div>
+
+      <div style="margin-top:14px; border-top:2px dashed #eee; padding-top:14px;">
+        <div style="font-weight:800; font-size:0.85rem; color:#888; margin-bottom:8px;">🔔 Kirim Notifikasi ke Semua</div>
+        <button class="btn btn-notif" onclick="sendPRNotif()">📢 Kirim Notifikasi PR Sekarang!</button>
+      </div>
+    </div>
+
+    <!-- Edit Deskripsi -->
+    <div class="admin-card">
+      <h3>📋 Edit Deskripsi / Pengumuman</h3>
+      <textarea id="editDesc" placeholder="Tulis pengumuman atau info kelas di sini..."></textarea>
+      <button class="btn btn-save" onclick="saveData('desc')">💾 Simpan Deskripsi</button>
+      <div class="save-msg" id="msgDesc"></div>
+    </div>
+
+    <button class="logout-btn" style="border-color:#c77dff33;color:#c77dff;" onclick="logout()">🚪 Keluar Admin</button>
+  </div>
+</div>
+
+<script>
+  // ===== Stars =====
+  const starsEl = document.getElementById('stars');
+  const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff'];
+  for (let i = 0; i < 25; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-delay:${Math.random()*4}s;
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+    `;
+    starsEl.appendChild(s);
+  }
+
+  // ===== Data Storage =====
+  const DATA_KEY = 'kelas6b_data';
+  function loadData() {
+    try { return JSON.parse(localStorage.getItem(DATA_KEY)) || {}; } catch(e) { return {}; }
+  }
+  function saveToStorage(data) {
+    localStorage.setItem(DATA_KEY, JSON.stringify(data));
+  }
+
+  let currentRole = null; // 'student' or 'admin'
+  let prStatus = 'tidak';
+
+  // ===== Show/hide screens =====
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(id);
+    el.classList.add('active');
+  }
+
+  // ===== Login =====
+  function doLogin() {
+    const pass = document.getElementById('loginPass').value.trim();
+    const err = document.getElementById('loginError');
+    if (pass.toLowerCase() === 'kelas 6b') {
+      currentRole = 'student';
+      err.textContent = '';
+      loadMainView();
+      showScreen('mainScreen');
+      checkNotifStatus();
+    } else if (pass === 'Rahasia') {
+      currentRole = 'admin';
+      err.textContent = '';
+      loadAdminView();
+      showScreen('adminScreen');
+    } else {
+      err.textContent = '❌ Password salah, coba lagi!';
+      document.getElementById('loginPass').value = '';
+    }
+  }
+
+  function showAdminLogin() {
+    document.getElementById('loginPass').placeholder = '🔒 Password admin...';
+    document.getElementById('loginPass').focus();
+    showToast('Masukkan password rahasia ⚙️');
+  }
+
+  function logout() {
+    currentRole = null;
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').placeholder = '🔑 Masukkan password...';
+    document.getElementById('loginError').textContent = '';
+    showScreen('loginScreen');
+  }
+
+  // ===== Load Main View =====
+  function loadMainView() {
+    const d = loadData();
+    document.getElementById('viewPiket').textContent = d.piket || 'Belum ada data piket.';
+    document.getElementById('viewDesc').textContent = d.desc || 'Belum ada pengumuman.';
+    const ada = d.prStatus === 'ada';
+    document.getElementById('prStatusPill').className = 'pr-status ' + (ada ? 'pr-ada' : 'pr-tidak');
+    document.getElementById('prStatusPill').textContent = ada ? '📚 Ada PR!' : '✅ Tidak ada PR';
+    document.getElementById('viewPR').textContent = ada ? (d.pr || '—') : '—';
+  }
+
+  // ===== Load Admin View =====
+  function loadAdminView() {
+    const d = loadData();
+    document.getElementById('editPiket').value = d.piket || '';
+    document.getElementById('editPR').value = d.pr || '';
+    document.getElementById('editDesc').value = d.desc || '';
+    setPRStatus(d.prStatus || 'tidak', true);
+  }
+
+  function setPRStatus(status, silent=false) {
+    prStatus = status;
+    if (status === 'ada') {
+      document.getElementById('btnAda').className = 'toggle-btn selected-ada';
+      document.getElementById('btnTidak').className = 'toggle-btn';
+    } else {
+      document.getElementById('btnTidak').className = 'toggle-btn selected-tidak';
+      document.getElementById('btnAda').className = 'toggle-btn';
+    }
+  }
+
+  // ===== Save Data =====
+  function saveData(type) {
+    const d = loadData();
+    if (type === 'piket') {
+      d.piket = document.getElementById('editPiket').value;
+      showSaveMsg('msgPiket', '✅ Piket tersimpan!');
+    } else if (type === 'pr') {
+      d.pr = document.getElementById('editPR').value;
+      d.prStatus = prStatus;
+      showSaveMsg('msgPR', '✅ PR tersimpan!');
+    } else if (type === 'desc') {
+      d.desc = document.getElementById('editDesc').value;
+      showSaveMsg('msgDesc', '✅ Deskripsi tersimpan!');
+    }
+    saveToStorage(d);
+    showToast('💾 Data berhasil disimpan!');
+  }
+
+  function showSaveMsg(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    setTimeout(() => el.textContent = '', 3000);
+  }
+
+  // ===== Notifications =====
+  function checkNotifStatus() {
+    const banner = document.getElementById('notifBanner');
+    if (!('Notification' in window)) {
+      banner.innerHTML = '<span>🔕</span><div><div>Notifikasi tidak didukung</div></div>';
+      return;
+    }
+    if (Notification.permission === 'granted') {
+      setNotifGranted();
+      // Check if PR active on load
+      const d = loadData();
+      if (d.prStatus === 'ada') {
+        setTimeout(() => {
+          new Notification('📚 Kelas 6B - Ada PR!', {
+            body: 'ada pr, jangan lupa kamu kerjakan!',
+            icon: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f4da.png'
+          });
+        }, 1500);
+      }
+    }
+  }
+
+  function requestNotif() {
+    if (!('Notification' in window)) { showToast('Browser tidak mendukung notifikasi'); return; }
+    if (Notification.permission === 'granted') { showToast('Notifikasi sudah aktif! 🔔'); return; }
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') {
+        setNotifGranted();
+        showToast('✅ Notifikasi berhasil diaktifkan!');
+        new Notification('✅ Kelas 6B', { body: 'Notifikasi berhasil diaktifkan! Kamu akan dapat pengingat PR.' });
+      } else {
+        showToast('❌ Notifikasi ditolak');
+      }
+    });
+  }
+
+  function setNotifGranted() {
+    const banner = document.getElementById('notifBanner');
+    banner.className = 'notif-banner granted';
+    banner.innerHTML = '<span>✅</span><div><div style="font-size:1rem;">Notifikasi Aktif!</div><div style="font-size:0.8rem;opacity:0.9;">Kamu akan dapat pengingat PR</div></div>';
+  }
+
+  function sendPRNotif() {
+    if (!('Notification' in window)) { showToast('Browser tidak mendukung notifikasi'); return; }
+    const d = loadData();
+    const prText = d.pr ? `\n${d.pr}` : '';
+    if (Notification.permission === 'granted') {
+      new Notification('📚 Kelas 6B - Ada PR!', {
+        body: `ada pr, jangan lupa kamu kerjakan!${prText}`,
+        icon: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f4da.png'
+      });
+      showToast('📢 Notifikasi berhasil dikirim!');
+    } else if (Notification.permission === 'default') {
+      Notification.requestPermission().then(p => {
+        if (p === 'granted') sendPRNotif();
+      });
+    } else {
+      showToast('❌ Izin notifikasi tidak diberikan');
+    }
+  }
+
+  // ===== Toast =====
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>
